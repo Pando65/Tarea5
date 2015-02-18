@@ -1,18 +1,17 @@
 package tarea5;
 
 /**
- * 1er Examen - Proyecto de Desarrollo de Videojuegos
+ * Tarea 5
  *
  * Juego donde Juanito debe atrapar los Chimpys y huir de los Diddys
+ * Se le agrego la posiblidad de guardar las partidas
  *
  * @author Omar Manjarrez & Jose Manuel Gonzalez 
- * @matriculas A008XXXXX & A01280106
+ * @matriculas A00815248 & A01280106
  * @version 1.0
  * @date 11/02/15
  */ 
  
-import java.applet.Applet;
-import java.applet.AudioClip;
 import java.awt.Graphics;
 import java.awt.Image;
 import static java.awt.Color.yellow;
@@ -33,10 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
 
-/**
- *
- * @author AntonioM
- */
+
 public class Juego extends JFrame implements Runnable, KeyListener {
 
     private final int iMAXANCHO = 10; // maximo numero de personajes por ancho
@@ -52,9 +48,9 @@ public class Juego extends JFrame implements Runnable, KeyListener {
     private Graphics graGraficaApplet;  // Objeto grafico de la Imagen
     private SoundClip socSonidoChimpy;   // Objeto sonido de Chimpy
     private SoundClip socSonidoDiddy; //objeto sonido de Diddy
-    private URL urlImagenChimpy;
-    private URL urlImagenDiddy;
-    private URL urlImagenPrincipal;
+    private URL urlImagenChimpy; //URL de la imagen de chimpys
+    private URL urlImagenDiddy; //URL de la imagen de diddys
+    private URL urlImagenPrincipal; //URL de la imagen del jugador principal
     
     private int iDir; //Direccion del objeto principal
     private int iAceleracion; //Aceleracion de los enemigos
@@ -64,69 +60,134 @@ public class Juego extends JFrame implements Runnable, KeyListener {
     private boolean bPausa; //indica si el juego está en pausa
     private boolean bGameover; //indica si ya se perdio el juego o no
     
+    /**
+     * Juego.
+     * 
+     * Constructor de la clase Juego.
+     * 
+     */
     public Juego() {
+        //Llama a init para inicializar 
         init();
+        
+        //Inicio el juego
         start();
+        
+        //Añado ésta linea para que el jFrame termine al cerrar
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 	
+    /**
+     * grabaArchivoVidasScore
+     * 
+     * Método que guarda vidas y score actual
+     * 
+     * @throws IOException 
+     */
     public void grabaArchivoVidasScore() throws IOException {
+        //Declaro la variable que escribira en los archivos de texto
          PrintWriter prwFileOut = new PrintWriter
                 (new FileWriter("VidasScore.txt"));
+         
+         //Guardo los datos que necesito
          prwFileOut.println(Integer.toString(iVidas));
          prwFileOut.println(Integer.toString(iScore));
          prwFileOut.println(Integer.toString(iAceleracion));
          prwFileOut.println(Boolean.toString(bPausa));
+         
+         //Cierro el archivo
          prwFileOut.close();
     }
     
+    /**
+     * grabaArchivoPosiciones
+     * 
+     * Método que guarda todas las posiciones de los personajes en el juego
+     * 
+     * @throws IOException 
+     */
     public void grabaArchivoPosiciones() throws IOException {
+        //Declaro la variable que va a imprimir
          PrintWriter prwFileOut = new PrintWriter
                 (new FileWriter("Posiciones.txt"));
+         
+         //Imprimo la información que quiero guardar
+         //Número de chimpys
          prwFileOut.println(Integer.toString(lklChimpys.size()));
+         //Posiciones X y Y de los chimpys
          for (int iI = 0; iI < lklChimpys.size(); iI ++) {
              prwFileOut.println(Integer.toString(lklChimpys.get(iI).getX()));
              prwFileOut.println(Integer.toString(lklChimpys.get(iI).getY()));
          }
+         
+         //Número de Diddys
          prwFileOut.println(Integer.toString(lklDiddys.size()));
+         //Posiciones X y Y de los Diddys
          for (int iI = 0; iI < lklDiddys.size(); iI ++) {
              prwFileOut.println(Integer.toString(lklDiddys.get(iI).getX()));
              prwFileOut.println(Integer.toString(lklDiddys.get(iI).getY()));
          }
+         
+         //Posicion del personaje principal
          prwFileOut.println(Integer.toString(basPrincipal.getX()));
          prwFileOut.println(Integer.toString(basPrincipal.getY()));
          
+         //Ciero el archivo
          prwFileOut.close();
     }
     
+    /**
+     * leeArchivoVidasScore
+     * 
+     * Método que carga la información sobre vidas y score
+     * 
+     * @throws IOException 
+     */
     public void leeArchivoVidasScore() throws IOException {
-
+        //Declaro la variable que va a leer
         BufferedReader fileIn;
-        try {
-                fileIn = new BufferedReader(new FileReader("VidasScore.txt"));
+        
+        //Trato de leer el archivo
+        try {    
+            fileIn = new BufferedReader(new FileReader("VidasScore.txt"));
         } catch (FileNotFoundException e){
-                File filVidasScore = new File("VidasScore.txt");
-                PrintWriter prwFileOut = new PrintWriter(filVidasScore);
-                prwFileOut.println("4");
-                prwFileOut.println("0");
-                prwFileOut.println("1");
-                prwFileOut.close();
-                fileIn = new BufferedReader(new FileReader("VidasScore.txt"));
+            //Si no existe el archivo, creo uno y lo lleno con datos Default    
+            File filVidasScore = new File("VidasScore.txt");
+            PrintWriter prwFileOut = new PrintWriter(filVidasScore);
+            prwFileOut.println("4");
+            prwFileOut.println("0");
+            prwFileOut.println("1");
+            prwFileOut.close();
+            fileIn = new BufferedReader(new FileReader("VidasScore.txt"));
         }
+        //Leo la información
         String sVidas = fileIn.readLine();
         String sScore = fileIn.readLine();
         String sAceleracion = fileIn.readLine();
         String sPausa = fileIn.readLine();
+        
+        //Guardo la información leida en las variables correspondientes
         iVidas = Integer.parseInt(sVidas);
         iScore = Integer.parseInt(sScore);
         iAceleracion = Integer.parseInt(sAceleracion);
         bPausa = Boolean.parseBoolean(sPausa);
+        
+        //Ciero el archivo de lectura
         fileIn.close();
     }
 
+    /**
+     * leePosiciones
+     * 
+     * Método que carga las posiciones guardadas de todas las personajes.
+     * 
+     * @throws IOException 
+     */
     public void leePosiciones() throws IOException {
-
+        //Declaro el archivo que se usara para leer
         BufferedReader fileIn;
+        
+        //Trato de hacer la conexión 
         try {
                 fileIn = new BufferedReader(new FileReader("Posiciones.txt"));
         } catch (FileNotFoundException e){
