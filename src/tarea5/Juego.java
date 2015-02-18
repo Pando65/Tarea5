@@ -67,7 +67,7 @@ public class Juego extends JFrame implements Runnable, KeyListener {
      * 
      */
     public Juego() {
-        //Llama a init para inicializar 
+        //Llama a init para inicializar todo
         init();
         
         //Inicio el juego
