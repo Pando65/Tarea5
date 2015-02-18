@@ -9,7 +9,7 @@ package tarea5;
  * @author Omar Manjarrez & Jose Manuel Gonzalez 
  * @matriculas A00815248 & A01280106
  * @version 1.0
- * @date 11/02/15
+ * @date 17/02/15
  */ 
  
 import java.awt.Graphics;
@@ -132,7 +132,7 @@ public class Juego extends JFrame implements Runnable, KeyListener {
          prwFileOut.println(Integer.toString(basPrincipal.getX()));
          prwFileOut.println(Integer.toString(basPrincipal.getY()));
          
-         //Ciero el archivo
+         //Cierro el archivo
          prwFileOut.close();
     }
     
@@ -160,7 +160,7 @@ public class Juego extends JFrame implements Runnable, KeyListener {
             prwFileOut.close();
             fileIn = new BufferedReader(new FileReader("VidasScore.txt"));
         }
-        //Leo la información
+        //Leo la información de las vidas, puntuacion, velocidad y pausa
         String sVidas = fileIn.readLine();
         String sScore = fileIn.readLine();
         String sAceleracion = fileIn.readLine();
@@ -191,6 +191,7 @@ public class Juego extends JFrame implements Runnable, KeyListener {
         try {
                 fileIn = new BufferedReader(new FileReader("Posiciones.txt"));
         } catch (FileNotFoundException e){
+                // SI hay error, imprimo posiciones al azar en el archivo
                 File filVidasScore = new File("Posiciones.txt");
                 PrintWriter prwFileOut = new PrintWriter(filVidasScore);
                 prwFileOut.println("0");
@@ -200,9 +201,13 @@ public class Juego extends JFrame implements Runnable, KeyListener {
                 prwFileOut.close();
                 fileIn = new BufferedReader(new FileReader("Posiciones.txt"));
         }
+        // Leo la cantidad de changos en la lista        
         String sLimite = fileIn.readLine();
+        // Borro lo que estaba en la lista original
         lklChimpys.clear();
+        // Creo variables para guardar las posiciones de los personajes
         int iPosicionX, iPosicionY;
+        // Creo la lista encadenada con las posiciones agarradas del archivo
         for(int iI = 0; iI < Integer.parseInt(sLimite); iI ++) {
             iPosicionX = Integer.parseInt(fileIn.readLine());
             iPosicionY = Integer.parseInt(fileIn.readLine());
@@ -211,8 +216,11 @@ public class Juego extends JFrame implements Runnable, KeyListener {
                     Toolkit.getDefaultToolkit().getImage(urlImagenChimpy));
             lklChimpys.add(basChimpy);
         }
+        // Vuelvo a leer la cantidad de changos en la otra lista
         sLimite = fileIn.readLine();
+        // Borro la lista que tenia antes
         lklDiddys.clear();
+        // Creo la lista de los otros changos con los datos del archivo
         for(int iI = 0; iI < Integer.parseInt(sLimite); iI ++) {
             iPosicionX = Integer.parseInt(fileIn.readLine());
             iPosicionY = Integer.parseInt(fileIn.readLine());
@@ -221,12 +229,14 @@ public class Juego extends JFrame implements Runnable, KeyListener {
                     Toolkit.getDefaultToolkit().getImage(urlImagenDiddy));
             lklDiddys.add(basDiddy);
         }
+        // Leo las posiciones de Juanito
         iPosicionX = Integer.parseInt(fileIn.readLine());
         iPosicionY = Integer.parseInt(fileIn.readLine());
+        // Creo al objeto de Juanito
         basPrincipal = new Base(iPosicionX, iPosicionY, getWidth() / iMAXANCHO,
                 getHeight() / iMAXALTO,
                 Toolkit.getDefaultToolkit().getImage(urlImagenPrincipal));
-        
+        // Cierro el archivo
         fileIn.close();
     }
     
@@ -243,7 +253,8 @@ public class Juego extends JFrame implements Runnable, KeyListener {
         // hago el applet de un tamaño 500,500
         setSize(800,500);
              
-	urlImagenPrincipal = this.getClass().getResource("juanito.gif");
+	// Se crea el URL de Juanito donde se guarda su imagen
+        urlImagenPrincipal = this.getClass().getResource("juanito.gif");
                 
         // se crea el objeto para principal 
 	basPrincipal = new Base(0, 0, getWidth() / iMAXANCHO,
@@ -260,24 +271,24 @@ public class Juego extends JFrame implements Runnable, KeyListener {
         URL urlImagenGameover = this.getClass().getResource("gameover.png");
         imaGameover = Toolkit.getDefaultToolkit().getImage(urlImagenGameover);
 
-        //Instancio las linked list
+        // Instancio las linked list
         lklChimpys = new LinkedList();
         lklDiddys = new LinkedList();
         
-        //creo variable para generar numeros random
+        // creo variable para generar numeros random
         Random ranAleatorio = new Random();
         
-        //creo cantidades de personajes
+        // creo cantidades de personajes
         int iChimpys = ranAleatorio.nextInt(5) + 3;
         int iDiddys = ranAleatorio.nextInt(5) + 3;
         
-        //pongo valores iniciales de mis variables
+        // pongo valores iniciales de mis variables
         iAceleracion = 1;
         iScore = 0;
         bPausa = false;
         bGameover = false;
         
-        //creo los iChimpys
+        // creo los iChimpys
         for(int iI = 0; iI < iChimpys; iI ++) {
             int iPosX = ranAleatorio.nextInt(getWidth()) + getWidth();
             int iPosY = ranAleatorio.nextInt(iMAXALTO) * getHeight() / iMAXALTO;
@@ -297,12 +308,14 @@ public class Juego extends JFrame implements Runnable, KeyListener {
             lklDiddys.add(basDiddy);
         }        
         
-        //Coloco cantidad inicial de vidas
+        // Coloco cantidad inicial de vidas
         iVidas = ranAleatorio.nextInt(2) + 4;
     
+        // Se crean los sonidos de Diddy y Chimpy
         socSonidoChimpy = new SoundClip("monkey1.wav");
         socSonidoDiddy = new SoundClip("monkey2.wav");
         
+        // Permito que se cicle el sonido para que pueda escuchar
         socSonidoChimpy.setLooping(true);
         socSonidoDiddy.setLooping(true);
         
@@ -633,7 +646,7 @@ public class Juego extends JFrame implements Runnable, KeyListener {
             bGameover = true;
         }
         
-        //Preungto si el usuario quiere guardar los datos de la partida
+        // Pregunto si el usuario quiere guardar los datos de la partida
         if(keyEvent.getKeyCode() == 'G') {
             // Si hay un error se detecta y se atrapa 
             try {
@@ -643,7 +656,7 @@ public class Juego extends JFrame implements Runnable, KeyListener {
                 Logger.getLogger(Juego.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
+        // Pregunto si el usuario quiere cargar los datos de la partida
         if(keyEvent.getKeyCode() == 'C') {
             try {
                 leeArchivoVidasScore();
