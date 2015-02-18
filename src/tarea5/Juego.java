@@ -5,7 +5,8 @@ package tarea5;
  *
  * Juego donde Juanito debe atrapar los Chimpys y huir de los Diddys
  *
- * @author Omar Manjarrez
+ * @author Omar Manjarrez & Jose Manuel Gonzalez 
+ * @matriculas A008XXXXX & A01280106
  * @version 1.0
  * @date 11/02/15
  */ 
@@ -46,11 +47,14 @@ public class Juego extends JFrame implements Runnable, KeyListener {
     private LinkedList<Base> lklDiddys; //coleccion de Diddys
     
     /* objetos para manejar el buffer del Applet y este no parpadee */
-    private Image    imaImagenApplet;   // Imagen a proyectar en Applet	
+    private Image imaImagenApplet;   // Imagen a proyectar en Applet	
     private Image imaGameover; //imagen a mostrar cuando se pierde
     private Graphics graGraficaApplet;  // Objeto grafico de la Imagen
     private SoundClip socSonidoChimpy;   // Objeto sonido de Chimpy
     private SoundClip socSonidoDiddy; //objeto sonido de Diddy
+    private URL urlImagenChimpy;
+    private URL urlImagenDiddy;
+    private URL urlImagenPrincipal;
     
     private int iDir; //Direccion del objeto principal
     private int iAceleracion; //Aceleracion de los enemigos
@@ -59,7 +63,6 @@ public class Juego extends JFrame implements Runnable, KeyListener {
     private boolean bTecla; //Bandera que indica si se presiono una flecha
     private boolean bPausa; //indica si el juego está en pausa
     private boolean bGameover; //indica si ya se perdio el juego o no
-    private Object vec;
     
     public Juego() {
         init();
@@ -67,29 +70,104 @@ public class Juego extends JFrame implements Runnable, KeyListener {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 	
-    public void grabaArchivoVidas() throws IOException {
-         PrintWriter fileOut = new PrintWriter(new FileWriter("Vidas.txt"));
-         fileOut.println(Integer.toString(iVidas));
-         fileOut.close();
+    public void grabaArchivoVidasScore() throws IOException {
+         PrintWriter prwFileOut = new PrintWriter
+                (new FileWriter("VidasScore.txt"));
+         prwFileOut.println(Integer.toString(iVidas));
+         prwFileOut.println(Integer.toString(iScore));
+         prwFileOut.println(Integer.toString(iAceleracion));
+         prwFileOut.println(Boolean.toString(bPausa));
+         prwFileOut.close();
     }
     
-    public void leeArchivoVidas() throws IOException {
+    public void grabaArchivoPosiciones() throws IOException {
+         PrintWriter prwFileOut = new PrintWriter
+                (new FileWriter("Posiciones.txt"));
+         prwFileOut.println(Integer.toString(lklChimpys.size()));
+         for (int iI = 0; iI < lklChimpys.size(); iI ++) {
+             prwFileOut.println(Integer.toString(lklChimpys.get(iI).getX()));
+             prwFileOut.println(Integer.toString(lklChimpys.get(iI).getY()));
+         }
+         prwFileOut.println(Integer.toString(lklDiddys.size()));
+         for (int iI = 0; iI < lklDiddys.size(); iI ++) {
+             prwFileOut.println(Integer.toString(lklDiddys.get(iI).getX()));
+             prwFileOut.println(Integer.toString(lklDiddys.get(iI).getY()));
+         }
+         prwFileOut.println(Integer.toString(basPrincipal.getX()));
+         prwFileOut.println(Integer.toString(basPrincipal.getY()));
+         
+         prwFileOut.close();
+    }
+    
+    public void leeArchivoVidasScore() throws IOException {
 
         BufferedReader fileIn;
         try {
-                fileIn = new BufferedReader(new FileReader("Vidas.txt"));
+                fileIn = new BufferedReader(new FileReader("VidasScore.txt"));
         } catch (FileNotFoundException e){
-                File puntos = new File("Vidas.txt");
-                PrintWriter fileOut = new PrintWriter(puntos);
-                fileOut.println("4");
-                fileOut.close();
-                fileIn = new BufferedReader(new FileReader("Vidas.txt"));
+                File filVidasScore = new File("VidasScore.txt");
+                PrintWriter prwFileOut = new PrintWriter(filVidasScore);
+                prwFileOut.println("4");
+                prwFileOut.println("0");
+                prwFileOut.println("1");
+                prwFileOut.close();
+                fileIn = new BufferedReader(new FileReader("VidasScore.txt"));
         }
-        String dato = fileIn.readLine();
-        iVidas = Integer.parseInt(dato);
+        String sVidas = fileIn.readLine();
+        String sScore = fileIn.readLine();
+        String sAceleracion = fileIn.readLine();
+        String sPausa = fileIn.readLine();
+        iVidas = Integer.parseInt(sVidas);
+        iScore = Integer.parseInt(sScore);
+        iAceleracion = Integer.parseInt(sAceleracion);
+        bPausa = Boolean.parseBoolean(sPausa);
         fileIn.close();
     }
 
+    public void leePosiciones() throws IOException {
+
+        BufferedReader fileIn;
+        try {
+                fileIn = new BufferedReader(new FileReader("Posiciones.txt"));
+        } catch (FileNotFoundException e){
+                File filVidasScore = new File("Posiciones.txt");
+                PrintWriter prwFileOut = new PrintWriter(filVidasScore);
+                prwFileOut.println("0");
+                prwFileOut.println("0");
+                prwFileOut.println("300");
+                prwFileOut.println("300");
+                prwFileOut.close();
+                fileIn = new BufferedReader(new FileReader("Posiciones.txt"));
+        }
+        String sLimite = fileIn.readLine();
+        lklChimpys.clear();
+        int iPosicionX, iPosicionY;
+        for(int iI = 0; iI < Integer.parseInt(sLimite); iI ++) {
+            iPosicionX = Integer.parseInt(fileIn.readLine());
+            iPosicionY = Integer.parseInt(fileIn.readLine());
+            Base basChimpy = new Base(iPosicionX,iPosicionY, getWidth() 
+                    / iMAXANCHO, getHeight() / iMAXALTO,
+                    Toolkit.getDefaultToolkit().getImage(urlImagenChimpy));
+            lklChimpys.add(basChimpy);
+        }
+        sLimite = fileIn.readLine();
+        lklDiddys.clear();
+        for(int iI = 0; iI < Integer.parseInt(sLimite); iI ++) {
+            iPosicionX = Integer.parseInt(fileIn.readLine());
+            iPosicionY = Integer.parseInt(fileIn.readLine());
+            Base basDiddy = new Base(iPosicionX,iPosicionY, getWidth() 
+                    / iMAXANCHO, getHeight() / iMAXALTO,
+                    Toolkit.getDefaultToolkit().getImage(urlImagenDiddy));
+            lklDiddys.add(basDiddy);
+        }
+        iPosicionX = Integer.parseInt(fileIn.readLine());
+        iPosicionY = Integer.parseInt(fileIn.readLine());
+        basPrincipal = new Base(iPosicionX, iPosicionY, getWidth() / iMAXANCHO,
+                getHeight() / iMAXALTO,
+                Toolkit.getDefaultToolkit().getImage(urlImagenPrincipal));
+        
+        fileIn.close();
+    }
     
     
     /** 
@@ -100,11 +178,11 @@ public class Juego extends JFrame implements Runnable, KeyListener {
      * a usarse en el <code>Applet</code> y se definen funcionalidades.
      * 
      */
-    public void init() {//en vez del init ponen el constructor
+    public void init() {
         // hago el applet de un tamaño 500,500
         setSize(800,500);
              
-	URL urlImagenPrincipal = this.getClass().getResource("juanito.gif");
+	urlImagenPrincipal = this.getClass().getResource("juanito.gif");
                 
         // se crea el objeto para principal 
 	basPrincipal = new Base(0, 0, getWidth() / iMAXANCHO,
@@ -116,8 +194,8 @@ public class Juego extends JFrame implements Runnable, KeyListener {
         basPrincipal.setY(getHeight() / 2);
         
         // defino imagenes
-	URL urlImagenChimpy = this.getClass().getResource("chimpy.gif");
-        URL urlImagenDiddy = this.getClass().getResource("diddy.gif");
+	urlImagenChimpy = this.getClass().getResource("chimpy.gif");
+        urlImagenDiddy = this.getClass().getResource("diddy.gif");
         URL urlImagenGameover = this.getClass().getResource("gameover.png");
         imaGameover = Toolkit.getDefaultToolkit().getImage(urlImagenGameover);
 
@@ -498,7 +576,8 @@ public class Juego extends JFrame implements Runnable, KeyListener {
         if(keyEvent.getKeyCode() == 'G') {
             // Si hay un error se detecta y se atrapa 
             try {
-                grabaArchivoVidas();
+                grabaArchivoVidasScore();
+                grabaArchivoPosiciones();
             } catch (IOException ex) {
                 Logger.getLogger(Juego.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -506,7 +585,8 @@ public class Juego extends JFrame implements Runnable, KeyListener {
         
         if(keyEvent.getKeyCode() == 'C') {
             try {
-                leeArchivoVidas();
+                leeArchivoVidasScore();
+                leePosiciones();
             } catch (IOException ex) {
                 Logger.getLogger(Juego.class.getName()).log(Level.SEVERE, null, ex);
             }
