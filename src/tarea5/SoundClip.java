@@ -123,10 +123,8 @@ public class SoundClip {
                                                         
                 clip.setFramePosition(0);
                                                      
-                if (looping) 
-                    clip.loop(Clip.LOOP_CONTINUOUSLY);
-                else 
-                    clip.loop(repeat);
+
+                clip.loop(repeat);
         }
 //El método stop se encarga simplemente de parar la reproducción del sonido.
 
