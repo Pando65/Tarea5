@@ -650,6 +650,7 @@ public class Juego extends JFrame implements Runnable, KeyListener {
         if(keyEvent.getKeyCode() == 'G') {
             // Si hay un error se detecta y se atrapa 
             try {
+                //llamo a grabar los datos
                 grabaArchivoVidasScore();
                 grabaArchivoPosiciones();
             } catch (IOException ex) {
@@ -659,6 +660,7 @@ public class Juego extends JFrame implements Runnable, KeyListener {
         // Pregunto si el usuario quiere cargar los datos de la partida
         if(keyEvent.getKeyCode() == 'C') {
             try {
+                //llamo a leer los archivos donde están guardados los daots
                 leeArchivoVidasScore();
                 leePosiciones();
             } catch (IOException ex) {
