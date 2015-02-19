@@ -1,3 +1,12 @@
+/**
+ * SoundClip
+ *
+ * Clase que sirve para controlar sonido en un JFrame
+ *
+ * @author Antonio Mejorado
+ * @version 1.0
+ * @date 17/02/15
+ */ 
 package tarea5;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -9,127 +18,198 @@ import java.io.IOException;
 import java.net.URL;
                                                         
 public class SoundClip { 
-                                                       
-        private AudioInputStream sample;
-        private Clip clip; 
-        private boolean looping = false;
-        private int repeat = 0;
-        private String filename = "";
-//El siguiente método es el constructor vacio, crea el objeto SoundClip con el buffer de sonido.
-
-        public SoundClip() { 
-                                                       
-                try {  
-                                                      
-                      clip = AudioSystem.getClip();
-                }catch (LineUnavailableException e) {  
-                                                      
-                      System.out.println("Error en " + e.toString());
-                }
+                                    
+    private AudioInputStream aisSample;
+    private Clip cliClip; 
+    private boolean bLooping = false;
+    private int iRepeat = 0;
+    private String sFilename = "";
+        
+    /**
+     * SoundClip
+     * 
+     * El siguiente método es el constructor vacio, crea el objeto SoundClip
+     * con el buffer de sonido.
+     */
+    public SoundClip() { 
+        try {  
+            cliClip = AudioSystem.getClip();
+        }catch (LineUnavailableException e) {  
+            System.out.println("Error en " + e.toString());
         }
-//Además se usa un constructor con parámetros que lo que hace es, manda llamar al constructor default y carga el archivo de sonido del nombre del archivo de sonido dado como parámetro.
+    }
+    
+    /**
+     * SoundClip
+     * 
+     * Además se usa un constructor con parámetros que lo que hace es, manda
+     * llamar al constructor default y carga el archivo de sonido del nombre 
+     * del archivo de sonido dado como parámetro.
+     * 
+     * @param sFilename 
+     */
+    public SoundClip(String sFilename) { 
+        this();
+        load(sFilename);
+    }
 
-        public SoundClip(String filename) { 
-                                                       
-                this();
-                load(filename);
+    /**
+     * setLooping
+     * 
+     * Asigna el valor al atributo bLooping
+     * 
+     * @param bLooping 
+     */
+    public void setLooping(boolean bLooping) {
+        this.bLooping = bLooping; 
+    }           
+
+    /**
+     * setRepeat
+     * 
+     * Asigna el valor del atributo iRepeat
+     * 
+     * @param iRepeat El nuevo valor de iRepeat
+     */
+    public void setRepeat(int iRepeat) {
+        this.iRepeat = iRepeat;
+    }  
+
+    /**
+     * setFilename
+     * 
+     * Asigna el nombre del archivo
+     * 
+     * @param sFilename El nombre del archivo
+     */
+    public void setFilename(String sFilename) {
+        this.sFilename = sFilename; 
+    }
+    
+    /**
+     * getClip
+     * 
+     * Regresa el clip actual
+     * 
+     * @return 
+     */
+    public Clip getClip() { 
+        return cliClip; 
+    }
+
+    /**
+     * getLooping
+     * 
+     * Regresa el estado de bLooping actual
+     * 
+     * @return 
+     */
+    public boolean getLooping() { 
+        return bLooping;
+    }
+
+    /**
+     * getRepeat
+     * 
+     * Regresa el valor de iRepeat actual
+     * 
+     * @return 
+     */
+    public int getRepeat() {
+        return iRepeat; 
+    }
+
+    /**
+     * getFilename
+     * 
+     * Regresa el valor de sFilename actual
+     * 
+     * @return 
+     */
+    public String getFilename() { 
+        return sFilename;
+    }
+
+    /**
+     * getURL
+     * 
+     * Regresa la URL de un nombre de archivo dado
+     * 
+     * @param sFilename el nombre del archivo
+     * @return 
+     */
+    private URL getURL(String sFilename) {
+        URL urlDireccion = null;
+        try {
+            urlDireccion = this.getClass().getResource(sFilename);
+        }catch (Exception e) {
+            System.out.println("Error en " + e.toString());
         }
-//Ahora tenemos los métodos modificadores, usados para cambiar los valores de nuestro objeto SoundClip.
-
-        public void setLooping(boolean looping) {
-
-                this.looping = looping; 
-        }           
-                                             
-        public void setRepeat(int repeat) {
-
-                this.repeat = repeat;
-        }  
-                                                      
-        public void setFilename(String filename) {
-
-                this.filename = filename; 
+        return urlDireccion;
+    }
+    
+    /**
+     * isLoaded
+     * 
+     * Para verificar si el archivo esta cargado o no, usamos el método
+     * isLoaded.
+     * 
+     * @return regresa un booleano que indica si el archivo está cargado
+     */
+    public boolean isLoaded() {
+        return (boolean)(aisSample != null);
+    }
+    
+    /**
+     * load
+     * 
+     * El método load nos sirve para poder cargar el archivo de audio, 
+     * recibe como parámetro un String con el nombre del archivo.
+     * 
+     * @param audiofile el nombre del archivo
+     * @return regresa un booleano para indicar si se cargo el archivo
+     */
+    public boolean load(String audiofile) { 
+        try {
+            setFilename(audiofile);
+            aisSample = AudioSystem.getAudioInputStream(getURL(sFilename)); 
+            cliClip.open(aisSample); 
+            return true;
+        } catch (IOException IOe) { 
+            System.out.println("Error en " + IOe.toString());
+            return false;
+        }catch (UnsupportedAudioFileException IOe) {
+            System.out.println("Error en " + IOe.toString());
+            return false;
+        }catch (LineUnavailableException IOe) {
+            System.out.println("Error en " + IOe.toString());
+            return false;
         }
-//Los métodos de acceso son usados para obtener los valores del objeto SoundClip.
+    }
+    
+    /**
+     * play
+     * 
+     * Para reproducir el archivo de sonido utilizamos el método play, que se 
+     * encarga de verificar si el archivo ha sido cargado o no y además si el 
+     * archivo debe reproducirse en forma continua.
+     * 
+     */
+    public void play() { 
+        if (!isLoaded()) 
+            return;
+        cliClip.setFramePosition(0);
+        cliClip.loop(iRepeat);
+    }
 
-        public Clip getClip() { 
-                                                       
-                return clip; 
-        }
-                                                   
-        public boolean getLooping() { 
-                                                       
-                return looping;
-        }
-                                                      
-        public int getRepeat() {
-                                                        
-                return repeat; 
-        }
-                                                     
-        public String getFilename() { 
-                                                       
-                return filename;
-        }
-                                                    
-        private URL getURL(String filename) {
-                                                       
-                URL url = null;
-                try {
-                                                     
-                      url = this.getClass().getResource(filename);
-                }catch (Exception e) {
-                                                       
-                      System.out.println("Error en " + e.toString());
-                }
-                return url;
-        }
-//Para verificar si el archivo esta cargado o no, usamos el método isLoaded.
-
-        public boolean isLoaded() {
-                                                        
-                return (boolean)(sample != null);
-        }
-//El método load nos sirve para poder cargar el archivo de audio, recibe como parámetro un String con el nombre del archivo.
-
-        public boolean load(String audiofile) { 
-                                                       
-                try {
-
-                      setFilename(audiofile);
-                      sample = AudioSystem.getAudioInputStream(getURL(filename)); 
-                      clip.open(sample); 
-                      return true;
-                } catch (IOException e) { 
-                                                       
-                      System.out.println("Error en " + e.toString());
-                      return false;
-                }catch (UnsupportedAudioFileException e) {
-                                                        
-                      System.out.println("Error en " + e.toString());
-                      return false;
-                }catch (LineUnavailableException e) {
-                                                      
-                      System.out.println("Error en " + e.toString());
-                      return false;
-                }
-        }
-//Para reproducir el archivo de sonido utilizamos el método play, que se encarga de verificar si el archivo ha sido cargado o no y además si el archivo debe reproducirse en forma continua.
-
-        public void play() { 
-                                                       
-                if (!isLoaded()) 
-                    return;
-                                                        
-                clip.setFramePosition(0);
-                                                     
-
-                clip.loop(repeat);
-        }
-//El método stop se encarga simplemente de parar la reproducción del sonido.
-
-        public void stop() { 
-                                                       
-                clip.stop();
-        }
+    /**
+     * stop
+     * 
+     * El método stop se encarga simplemente de parar la reproducción 
+     * del sonido.
+     * 
+     */
+    public void stop() { 
+        cliClip.stop();
+    }
 }
