@@ -1,7 +1,5 @@
-package tarea5;
-
 /**
- * Tarea 5
+ * Juego
  *
  * Juego donde Juanito debe atrapar los Chimpys y huir de los Diddys
  * Se le agrego la posiblidad de guardar las partidas
@@ -11,6 +9,8 @@ package tarea5;
  * @version 1.0
  * @date 17/02/15
  */ 
+
+package tarea5;
  
 import java.awt.Graphics;
 import java.awt.Image;
